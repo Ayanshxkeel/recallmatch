@@ -18,7 +18,7 @@ def load_recalls():
 
 def find_matches(data, query, limit=8):
     text = (data["Product"].fillna("") + " " + data["Title"].fillna("")).tolist()
-    model = TfidfVectorizer(stop_words="english", ngram_range=(1, 2), min_df=2)
+    model = TfidfVectorizer(stop_words="english", ngram_range=(1, 2), min_df=1)
     matrix = model.fit_transform(text + [query])
     scores = cosine_similarity(matrix[-1], matrix[:-1]).ravel()
     ranked = scores.argsort()[::-1][:limit]

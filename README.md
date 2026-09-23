@@ -1,20 +1,47 @@
 # RecallMatch
 
-Search Canadian product recall notices by product description. The app downloads Health Canada's public recall CSV, represents the notice titles and products with TF-IDF word and two-word phrases, and ranks them by cosine similarity to your query.
+Find potentially relevant Canadian product recalls from a product description. RecallMatch searches the [Government of Canada Recalls and Safety Alerts open dataset](https://open.canada.ca/data/en/dataset/d38de914-c94c-429b-8ab1-8776c31643e3) and links each result to its official notice.
 
-## Run
+**Purpose:** Recall headlines do not always use the words someone would type. This app ranks notices for a person to inspect; it does not determine whether their exact item, model, or batch is recalled.
+
+## Features
+
+- Downloads the public recall CSV and refreshes the cached copy every 24 hours.
+- Searches notice titles and product fields using word and two-word phrase matching.
+- Shows ranked notices, update dates, text similarity scores, and source links.
+- Gives a clear empty result when search terms do not match the dataset.
+
+## Run locally
+
+Requires Python 3 and internet access.
 
 ```bash
+git clone https://github.com/Ayanshxkeel/recallmatch.git
+cd recallmatch
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 streamlit run app.py
 ```
 
-Try `portable Bluetooth speaker` or a product and brand from a recent official notice. Open the linked notice to confirm the exact model or batch. A low score or no result **does not mean a product is safe**. The dataset is cached for 24 hours. This is text matching, not a safety classifier.
+Open the local URL printed by Streamlit. On Windows, activate with `.venv\Scripts\activate`.
 
-Data: [Government of Canada recalls and safety alerts](https://open.canada.ca/data/en/dataset/d38de914-c94c-429b-8ab1-8776c31643e3).
+## Try it
 
-## Learn the code
+Search `portable Bluetooth speaker`. Open a resulting official notice and check its exact product details. Then search a brand or model from that notice and see how the order changes. Search `xyzqnevermade` to see the no-match message.
 
-See [How it works](HOW_IT_WORKS.md) for the data flow, hands-on checks, limitations, and ideas for your own changes.
+## How it works
+
+`load_recalls()` downloads and parses the CSV. `find_matches()` combines each notice's product and title, converts those texts and the query to **TF-IDF** vectors, and sorts notices by **cosine similarity**. The score is text similarity, not recall probability. See [How it works](HOW_IT_WORKS.md) for a code walkthrough.
+
+## Files
+
+| File | Purpose |
+| --- | --- |
+| `app.py` | Streamlit interface, data download, and ranking |
+| `requirements.txt` | Python dependencies |
+| `HOW_IT_WORKS.md` | Explanation and hands-on changes |
+
+## Limits
+
+A model number may be mentioned only inside the linked notice, beyond the title and product fields searched here. Synonyms and misspellings can be missed. **No result does not mean a product is safe.** The public source must be reachable when the app loads. No AI API key is required.
